@@ -22,15 +22,17 @@ CREATE TABLE IF NOT EXISTS dev.raw.stock (
 DELETE FROM dev.raw.stock;
 
 -- Inserting records into the table
-
+-- The following line is just a sample.
 INSERT INTO dev.raw.stock (symbol, date, open, high, low, close, volume)
-                    VALUES ('JPM', ')
+                    VALUES ('JPM', ''2024-06-17', 190.2593, 192.3243, 189.4332, 191.7343, 8725400)
+--- All the records for 3 symbols of alst 180 days were inserted using python script.
+
+COMMIT;
+-- rollback if something goes wrong
+--ROLLBACK;
 
 
-
-
-
-
+-- For SECOND pipeline - train and predict
 -- CREATING VIEW FOR STOCK DATA.
 CREATE OR REPLACE VIEW dev.raw.stock_view AS
 SELECT
