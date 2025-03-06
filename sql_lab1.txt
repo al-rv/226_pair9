@@ -1,0 +1,55 @@
+-- CREATING VIEW FOR STOCK DATA.
+CREATE OR REPLACE VIEW dev.raw.stock_view AS
+SELECT
+    CAST(DATE AS TIMESTAMP_NTZ) AS DATE,
+    CLOSE,
+    SYMBOL
+FROM dev.raw.stock;
+
+-- CREATING ML FORECAST MODEL.
+CREATE OR REPLACE SNOWFLAKE.ML.FORECAST dev.raw.predict_stock_price (
+    INPUT_DATA => SYSTEM$REFERENCE('VIEW', 'dev.raw.stock_view'),
+    SERIES_COLNAME => 'SYMBOL',
+    TIMESTAMP_COLNAME => 'DATE',
+    TARGET_COLNAME => 'CLOSE',
+    CONFIG_OBJECT => { 'ON_ERROR': 'SKIP' }
+);
+
+-- EVALUATING MATRICS OF THE MODEL.
+CALL dev.raw.predict_stock_price!SHOW_EVALUATION_METRICS();
+
+-- MAKING PREDICTIONS USING THE MODEL
+CALL dev.raw.predict_stock_price!FORECAST(
+    FORECASTING_PERIODS => 7,
+    CONFIG_OBJECT => { 'prediction_interval': 0.95 }
+);
+
+--Capturing forecasted results into a table
+LET x := SQLID;
+CREATE OR REPLACE TABLE dev.raw.stock_forecast AS
+SELECT *
+FROM TABLE(RESULT_SCAN(:x));
+
+
+
+-- CREATING FINAL TABLE THAT CONTAINS ACTUAL AND FORECAST DATA
+CREATE TABLE IF NOT EXISTS dev.raw.final_data AS
+SELECT
+    SYMBOL,
+    DATE,
+    CLOSE AS actual,
+    NULL AS forecast,
+    NULL AS lower_bound,
+    NULL AS upper_bound
+FROM dev.raw.stock
+
+UNION ALL
+
+SELECT
+    REPLACE(series, '"', '') AS SYMBOL,
+    ts AS DATE,
+    NULL AS actual,
+    forecast,
+    lower_bound,
+    upper_bound
+FROM dev.raw.stock_forecast;
