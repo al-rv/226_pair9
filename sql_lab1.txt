@@ -1,3 +1,36 @@
+-- The following sql queries are run along with python script
+-- For fist pipeline - 226_lab1_etl
+-- loading extracted data into snowflake table
+CREATE DATABASE dev;
+CREATE SCHEMA dev.raw;
+
+BEGIN;
+
+Create the target table if it doesn't exist
+CREATE TABLE IF NOT EXISTS dev.raw.stock (
+    symbol STRING,
+    date TIMESTAMP,
+    open NUMBER(38, 4),
+    high NUMBER(38, 4),
+    low NUMBER(38, 4),
+    close NUMBER(38, 4),
+    volume NUMBER(38, 0),
+    PRIMARY KEY (symbol, date)
+);
+
+--Deleting all existing records in the target table
+DELETE FROM dev.raw.stock;
+
+-- Inserting records into the table
+
+INSERT INTO dev.raw.stock (symbol, date, open, high, low, close, volume)
+                    VALUES ('JPM', ')
+
+
+
+
+
+
 -- CREATING VIEW FOR STOCK DATA.
 CREATE OR REPLACE VIEW dev.raw.stock_view AS
 SELECT
