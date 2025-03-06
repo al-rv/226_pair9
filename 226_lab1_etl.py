@@ -1,5 +1,4 @@
 from airflow import DAG
-#from airflow.models import Variable
 from airflow.decorators import task
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from datetime import timedelta, datetime
@@ -108,9 +107,9 @@ with DAG(
     start_date=datetime(2024, 9, 25),
     catchup=False,
     tags=['ETL'],
-    schedule_interval='@daily'  # Runs at 00:30 hrs daily
+    schedule_interval='@daily'  # Runs daily
 ) as dag:
-    symbols = ['JPM', 'BAC']  # List of symbols
+    symbols = ['JPM', 'BAC', 'WFC']  # List of symbols
     target_table = "dev.raw.stock"
 
     data = extract(symbols)
